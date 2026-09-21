@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Edit User</title>
+    
 </head>
 <body>
-
-    <h1>Welcome to Sun International</h1>
-
+    <h1>Edit User</h1>
 
     @if($errors->any())
         <div style="color: red;">
@@ -20,54 +19,44 @@
         </div>
     @endif
 
-    @if (session('success'))
-        <p>{{ session('success') }}</p>
-    @endif
-
-
-
-
-    <form action="{{ route('submit') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
+        @method('PUT')
 
         <div class="form-group" style="margin-bottom: 10px;">
             <label for="name">Name:</label>
-            <input type="text" id="name" name="name" value="{{ old('name') }}" required>
+            <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" required>
         </div>
         <div class="form-group" style="margin-bottom: 10px;">
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="{{ old('email') }}" required>
-        </div>
-        <div class="form-group" style="margin-bottom: 10px;">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <div class="form-group" style="margin-bottom: 10px;">
-            <label for="password_confirmation">Confirm Password:</label>
-            <input type="password" id="password_confirmation" name="password_confirmation" required>
+            <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" required>
         </div>
         <div class="form-group" style="margin-bottom: 10px;">
             <label for="aadhar_no">Aadhar no:</label>
-            <input type="number" id="aadhar_no" name="aadhar_no" value="{{ old('aadhar_no') }}" required>
+            <input type="number" id="aadhar_no" name="aadhar_no" value="{{ old('aadhar_no', $user->aadhar_no) }}" required>
         </div>
 
         <div class="form-group" style="margin-bottom: 10px;">
             <label for="aadhar_image">Aadhar Image:</label>
             <input type="file" accept="image/*" id="aadhar_image" name="aadhar_image">
+            @if($user->aadhar_image)
+                <img src="{{ asset('storage/' . $user->aadhar_image) }}" alt="Aadhar Image" width="100">
+            @endif
         </div>
 
         <div class="form-group" style="margin-bottom: 10px;">
             <label for="pan_no">Pan no:</label>
-            <input type="text" id="pan_no" name="pan_no" value="{{ old('pan_no') }}" required>
+            <input type="text" id="pan_no" name="pan_no" value="{{ old('pan_no', $user->pan_no) }}" required>
         </div>
 
         <div class="form-group" style="margin-bottom: 10px;">
-            <label for="pan_image">Pan Image: </label>
+            <label for="pan_image">Pan Image:</label>
             <input type="file" accept="image/*" id="pan_image" name="pan_image">
+            @if($user->pan_image)
+                <img src="{{ asset('storage/' . $user->pan_image) }}" alt="Pan Image" width="100">  
+            @endif
         </div>
-
-        <button type="submit">Submit</button>
+        <button type="submit">Update User</button>
     </form>
-
 </body>
 </html>
