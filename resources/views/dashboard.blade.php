@@ -38,18 +38,17 @@
     </div>
 
 
-{{-- <div style="margin: 10px">
+<div style="margin: 10px">
 
 
     <form action="{{ route('dashboard') }}" method="GET">
         @csrf
-    //add searchbar
+
     <div>
         <input type="text" value="{{ request()->input('search') }}" name="search" placeholder="Search...">
 
     </div>
 
-    //document status filter
     <div>
         <select name="filter_document">
             <option value="">Select</option>
@@ -59,18 +58,18 @@
 
     </div>
 
-    //sorting
     <div>
         <select name="sort">
             <option value="">Select</option>
-            <option value="id" {{ request('id') === 'id'? 'selected' : '' }}> ID</option>
-            <option value="name" {{ request('name') === 'name'? 'selected' : '' }}> Name</option>
+
+            <option value="name" {{ request('sort') === 'name'? 'selected' : '' }}> Name</option>
+            <option value="latest" {{ request('sort') === 'latest'? 'selected' : '' }}> Latest</option>
+            <option value="oldest" {{ request('sort') === 'oldest'? 'selected' : '' }}> Oldest</option>
 
         </select>
 
     </div>
 
-    //submit button
     <div>
         <button type="submit" style="padding: 6px 14px; cursor: pointer;">Apply</button>
     </div>
@@ -81,7 +80,7 @@
             <a href="{{ route('dashboard') }}">Reset Filters</a>
         </div>
     @endif
-</div> --}}
+</div>
 
     <table border="1" cellpadding="10" cellspacing="0">
         <thead>

@@ -84,12 +84,53 @@ class UserController extends Controller
 
     public function dashboard(Request $request)
     {
-        $users = User::latest()->paginate(15);
+        $users = User::query();
 
-        if($request->has('search')) {
-            $users = User::where('name', 'like', '%' . $request->input('search') . '%')->orWhere('email', 'like', '%' . $request->input('search') . '%')->paginate(15);
+        if(request()->filled('search')) {
+
+            $users->when($request->input('search'), function ($query) use ($request) {
+                $sea = trim($request->input('search')); // Trim the search string
+
+                $query->where('name', 'like', '%' . $sea . '%')
+                    ->orWhere('email', 'like', '%' . $sea . '%')
+                    ->orWhere('aadhar_no', 'like', '%' . $sea . '%')
+                    ->orWhere('pan_no', 'like', '%' . $sea . '%');
+            });
+
         }
 
+        $users->when($request->input('filter_document'), function ($query) use ($request) {
+
+            if(request()->input('filter_document') === 'with_document') {
+                $query->where('aadhar_image', '!=', null);
+                $query->orWhere('pan_image', '!=', null);
+            }
+            else if(request()->input('filter_document') === 'without_document') {
+                $query->where('aadhar_image', '=', null);
+                $query->orWhere('pan_image', '=', null);
+            }
+        });
+
+
+        $users->when($request->input('sort'), function ($query) use ($request) {
+
+            if(request()->input('sort') === 'name') {
+                $query->orderBy('name');
+            }
+            else if(request()->input('sort') === 'latest') {
+                $query->orderBy('created_at', 'desc');
+            }
+            else if(request()->input('sort') === 'oldest') {
+                $query->orderBy('created_at', 'asc');
+            }
+        });
+
+
+        // if(request()->filled('sort')) {
+        //     $users = $users->orderBy(request()->input('sort'));
+        // }
+
+        $users = $users->paginate(15)->withQueryString();
 
         return view('dashboard', compact('users'));
     }
