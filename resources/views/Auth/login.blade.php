@@ -26,7 +26,7 @@
         <p>{{ session('success') }}</p>
     @endif
 
-    <form action="{{ route('login') }}" method="POST">
+    <form id="loginForm" action="{{ route('login') }}" method="POST">
         @csrf
 
         <div class="form-group" style="margin-bottom: 10px;">
@@ -54,3 +54,39 @@
 
 </body>
 </html>
+<script>
+   document.getElementById('loginForm').addEventListener('submit', async function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        const formData = new FormData(this);
+
+        try{
+
+            const api = await fetch("{{ route('login') }}", {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: formData
+            });
+
+            if (!api.ok) {
+                const errorData = await api.json();
+                throw new Error(errorData.error || 'An error occurred');
+            }
+            else {
+                const data = await api.json();
+                console.log('Success:', data);
+                localStorage.setItem('auth_token', data.token); // Store the token in local storage
+                // Redirect to the dashboard or any other page
+                window.location.href = "{{ route('dashboard') }}";
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert(error.message); // Show an alert with the error message
+
+        }
+
+    });
+</script>

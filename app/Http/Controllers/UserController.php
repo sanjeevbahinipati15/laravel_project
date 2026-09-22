@@ -7,8 +7,11 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 
+
 class UserController extends Controller
 {
+
+
 
     public function login(Request $request)
     {
@@ -19,16 +22,28 @@ class UserController extends Controller
             'remember' => 'nullable|boolean',
         ]);
 
+        $user = User::where('email', $request->input('email'))->firstOrFail();
+
         // Attempt to authenticate the user
         if (Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
 
             $request->session()->regenerate();
             // Authentication successful
-            return redirect()->intended('/dashboard')->with('success', 'Login successful!');
+            //return redirect()->intended('/dashboard')->with('success', 'Login successful!');
+
+            return response()->json([
+                'success' => 'Login successful!',
+                'user' => $user,
+                'token' => $user->createToken('auth_token')->plainTextToken,
+            ], 200);
         }
 
         // Authentication failed
-        return redirect()->back()->withErrors(['email' => 'Invalid credentials'])->withInput();
+        //return redirect()->back()->withErrors(['email' => 'Invalid credentials'])->withInput();
+        return response()->json([
+            'error' => 'Invalid credentials',
+        ], 401);
+
     }
 
     public function register(Request $request)
@@ -44,7 +59,7 @@ class UserController extends Controller
             'pan_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,jfif|max:2048',
         ]);
 
-         User::create([
+         $user = User::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
             'password' => bcrypt($request->input('password')),
@@ -58,14 +73,24 @@ class UserController extends Controller
 
         // Process the data (e.g., save to database, send email, etc.)
         // For demonstration, we'll just return a success response
-        //return response()->json(['message' => 'Form submitted successfully!'], 201);
+        return response()->json([
+            'success' => 'User registered successfully!',
+            'user' => $user,
+            'token' => $user->createToken('auth_token')->plainTextToken,
+        ], 201);
 
-        return redirect()->back()->with('success', 'Form submitted successfully!');
+        //return redirect()->back()->with('success', 'Form submitted successfully!');
     }
 
-    public function dashboard()
+    public function dashboard(Request $request)
     {
-        $users = User::all();
+        $users = User::latest()->paginate(15);
+
+        if($request->has('search')) {
+            $users = User::where('name', 'like', '%' . $request->input('search') . '%')->orWhere('email', 'like', '%' . $request->input('search') . '%')->paginate(15);
+        }
+
+
         return view('dashboard', compact('users'));
     }
 

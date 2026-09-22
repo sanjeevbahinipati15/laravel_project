@@ -30,6 +30,13 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'aadhar_no' => fake()->unique()->numerify('############'),
+            'aadhar_image'      => null,
+
+            // Standard 10-character PAN format: 5 uppercase letters, 4 digits, 1 uppercase letter
+            'pan_no'            => strtoupper(fake()->unique()->lexify('?????') . fake()->numerify('####') . fake()->lexify('?')),
+            'pan_image'         => null,
+
         ];
     }
 
