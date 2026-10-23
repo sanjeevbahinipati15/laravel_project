@@ -27,14 +27,12 @@
 
     <div id="profileDetails" style="margin-top: 20px;">
         <h2>Profile Details</h2>
-        <p id="name"><strong>Name:</strong> {{ Auth::user()->name }}</p>
-        <p id="email"><strong>Email:</strong> {{ Auth::user()->email }}</p>
-        <p id="aadharNo"><strong>Aadhar No:</strong> {{ Auth::user()->aadhar_no }}</p>
-        <p id="aadharImage"><strong>Aadhar Image:</strong></p>
-        {{-- <img src="{{ asset('storage/' . Auth::user()->aadhar_image) }}" alt="Aadhar Image" width="200"> --}}
-        <p id="panNo"><strong>Pan No:</strong> {{ Auth::user()->pan_no }}</p>
-        <p id="panImage"><strong>Pan Image:</ strong></p>
-        {{-- <img src="{{ asset('storage/' . Auth::user()->pan_image) }}" alt="Pan Image" width="200"> --}}
+        <p id="name"><strong>Name:</strong> Loading... </p>
+        <p id="email"><strong>Email:</strong> Loading... </p>
+        <p id="aadharNo"><strong>Aadhar No:</strong> Loading... </p>
+        <p id="aadharImage"><strong>Aadhar Image:</strong> Loading... </p>
+        <p id="panNo"><strong>Pan No:</strong> Loading... </p>
+        <p id="panImage"><strong>Pan Image:</ strong> Loading... </p>
     </div>
 
 
