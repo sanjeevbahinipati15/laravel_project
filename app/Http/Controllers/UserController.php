@@ -15,21 +15,28 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
-        // Validate the request data
+        // 1. Validate input (checking if it's either an email or a string)
         $request->validate([
-            'email' => 'required|email',
+            'login' => 'required|string',
             'password' => 'required|string',
             'remember' => 'nullable|boolean',
         ]);
 
-        $user = User::where('email', $request->input('email'))->firstOrFail();
+        $loginInput = $request->input('login');
 
-        // Attempt to authenticate the user
-        if (Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+        // 2. Determine whether the input is an email or mobile number
+        $field = filter_var($loginInput, FILTER_VALIDATE_EMAIL) ? 'email' : 'mobileno';
+
+        // 3. Find user by email or mobile number
+        $user = User::where($field, $loginInput)->first();
+
+        // 4. Check if user exists and password is correct
+        if ($user && \Illuminate\Support\Facades\Hash::check($request->input('password'), $user->password)) {
+
+            // Log the user in manually
+            Auth::login($user, $request->boolean('remember'));
 
             $request->session()->regenerate();
-            // Authentication successful
-            //return redirect()->intended('/dashboard')->with('success', 'Login successful!');
 
             return response()->json([
                 'success' => 'Login successful!',
@@ -39,33 +46,39 @@ class UserController extends Controller
         }
 
         // Authentication failed
-        //return redirect()->back()->withErrors(['email' => 'Invalid credentials'])->withInput();
         return response()->json([
             'error' => 'Invalid credentials',
         ], 401);
-
     }
 
     public function register(Request $request)
     {
+
+        $eighteenYearsAgo = now()->subYears(18)->format('Y-m-d');
+
         // Validate the request data
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'aadhar_no' => 'required|numeric|digits:12|unique:users,aadhar_no',
-            'aadhar_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,avif|max:2048',
-            'pan_no' => 'required|string|size:10|unique:users,pan_no',
+            'mobileno' => 'required|string|digits:10|unique:users,mobileno',
+            'dob' => "required|date|before_or_equal:{$eighteenYearsAgo}",            // 'aadhar_no' => 'required|numeric|digits:12|unique:users,aadhar_no',
+            // 'aadhar_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,avif|max:2048',
+            // 'pan_no' => 'required|string|size:10|unique:users,pan_no',
             'pan_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,jfif|max:2048',
+        ], [
+            'dob.before_or_equal' => 'You must be at least 18 years old to register.',
         ]);
 
          $user = User::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
             'password' => bcrypt($request->input('password')),
-            'aadhar_no' => $request->input('aadhar_no'),
-            'aadhar_image' => $request->file('aadhar_image') ? $request->file('aadhar_image')->store('aadhar_images', 'public') : null,
-            'pan_no' => strtoupper($request->input('pan_no')),
+            'mobileno' => $request->input('mobileno'),
+            'dob' => $request->input('dob'),
+            // 'aadhar_no' => $request->input('aadhar_no'),
+            // 'aadhar_image' => $request->file('aadhar_image') ? $request->file('aadhar_image')->store('aadhar_images', 'public') : null,
+            // 'pan_no' => strtoupper($request->input('pan_no')),
             'pan_image' => $request->file('pan_image') ? $request->file('pan_image')->store('pan_images', 'public') : null,
         ]);
 
@@ -73,13 +86,13 @@ class UserController extends Controller
 
         // Process the data (e.g., save to database, send email, etc.)
         // For demonstration, we'll just return a success response
-        return response()->json([
-            'success' => 'User registered successfully!',
-            'user' => $user,
-            'token' => $user->createToken('auth_token')->plainTextToken,
-        ], 201);
+        // return response()->json([
+        //     'success' => 'User registered successfully!',
+        //     'user' => $user,
+        //     'token' => $user->createToken('auth_token')->plainTextToken,
+        // ], 201);
 
-        //return redirect()->back()->with('success', 'Form submitted successfully!');
+        return redirect()->route('/')->with('success', 'Form submitted successfully!');
     }
 
     public function dashboard(Request $request)
@@ -138,18 +151,24 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::findOrFail($id);
+
+        //var_dump($user); // Debugging line to check the user data
         return view('edit_user', compact('user'));
     }
 
     public function update(Request $request, $id)
     {
+
+        $eighteenYearsAgo = now()->subYears(18)->format('Y-m-d');
         // Validate the request data
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $id,
-            'aadhar_no' => 'required|numeric|digits:12|unique:users,aadhar_no,' . $id,
-            'aadhar_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,avif|max:2048',
-            'pan_no' => 'required|string|size:10|unique:users,pan_no,' . $id,
+            // 'aadhar_no' => 'required|numeric|digits:12|unique:users,aadhar_no,' . $id,
+            // 'aadhar_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,avif|max:2048',
+            // 'pan_no' => 'required|string|size:10|unique:users,pan_no,' . $id,
+            'mobileno' => 'required|string|digits:10|unique:users,mobileno,' . $id,
+            'dob' => "required|date|before_or_equal:{$eighteenYearsAgo}",
             'pan_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,jfif|max:2048',
         ]);
 
@@ -159,9 +178,11 @@ class UserController extends Controller
         $user->update([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
-            'aadhar_no' => $request->input('aadhar_no'),
-            'aadhar_image' => $request->file('aadhar_image') ? $request->file('aadhar_image')->store('aadhar_images', 'public') : $user->aadhar_image,
-            'pan_no' => strtoupper($request->input('pan_no')),
+            'mobileno' => $request->input('mobileno'),
+            'dob' => $request->input('dob'),
+            // 'aadhar_no' => $request->input('aadhar_no'),
+            // 'aadhar_image' => $request->file('aadhar_image') ? $request->file('aadhar_image')->store('aadhar_images', 'public') : $user->aadhar_image,
+            // 'pan_no' => strtoupper($request->input('pan_no')),
             'pan_image' => $request->file('pan_image') ? $request->file('pan_image')->store('pan_images', 'public') : $user->pan_image,
         ]);
 

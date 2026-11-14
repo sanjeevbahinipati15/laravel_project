@@ -30,8 +30,8 @@
         @csrf
 
         <div class="form-group" style="margin-bottom: 10px;">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="{{ old('email') }}" required>
+            <label for="login">Email / Mobile No:</label>
+            <input type="text" id="login" name="login" value="{{ old('login') }}" required placeholder="Enter email or mobile no">
         </div>
         <div class="form-group" style="margin-bottom: 10px;">
             <label for="password">Password:</label>

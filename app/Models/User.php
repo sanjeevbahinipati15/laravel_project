@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
@@ -28,6 +29,7 @@ class User extends Authenticatable
         'aadhar_image',
         'pan_no',
         'pan_image',
+        'mobileno',
     ];
 
 
@@ -42,6 +44,12 @@ class User extends Authenticatable
 
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'dob' => 'date',
         ];
     }
+
+    protected function serializeDate(\DateTimeInterface $date): string
+{
+    return $date->format('Y-m-d'); // Changes API JSON output to just "2008-11-13"
+}
 }

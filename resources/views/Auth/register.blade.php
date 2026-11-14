@@ -36,6 +36,10 @@
             <input type="email" id="email" name="email" value="{{ old('email') }}" required>
         </div>
         <div class="form-group" style="margin-bottom: 10px;">
+            <label for="mobileno">Mobile No:</label>
+            <input type="number" id="mobileno" name="mobileno" value="{{ old('mobileno') }}" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 10px;">
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
         </div>
@@ -43,7 +47,7 @@
             <label for="password_confirmation">Confirm Password:</label>
             <input type="password" id="password_confirmation" name="password_confirmation" required>
         </div>
-        <div class="form-group" style="margin-bottom: 10px;">
+        {{-- <div class="form-group" style="margin-bottom: 10px;">
             <label for="aadhar_no">Aadhar no:</label>
             <input type="number" id="aadhar_no" name="aadhar_no" value="{{ old('aadhar_no') }}" required>
         </div>
@@ -56,10 +60,15 @@
         <div class="form-group" style="margin-bottom: 10px;">
             <label for="pan_no">Pan no:</label>
             <input type="text" id="pan_no" name="pan_no" value="{{ old('pan_no') }}" required>
+        </div> --}}
+
+        <div class="form-group" style="margin-bottom: 10px;">
+            <label for="dob">DOB:</label>
+            <input type="date" id="dob" name="dob" value="{{ old('dob') }}" max="{{ now()->subYears(18)->format('Y-m-d') }}" required>
         </div>
 
         <div class="form-group" style="margin-bottom: 10px;">
-            <label for="pan_image">Pan Image: </label>
+            <label for="pan_image">Profile Image: </label>
             <input type="file" accept="image/*" id="pan_image" name="pan_image">
         </div>
 
