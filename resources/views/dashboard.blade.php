@@ -189,6 +189,7 @@
                     window.location.href = '{{ route('login.form') }}';
                 }
             } catch (error) {
+                console.log('Error:', error);
                 console.error('Error:', error);
                 alert(error.message);
                 localStorage.removeItem('auth_token');
